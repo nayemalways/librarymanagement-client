@@ -1,21 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ModeToggle } from "./themeToggler";
+import logo from '../../../assets/logo.png';
 
 const Navbar = () => {
     const [open, setOpen] = React.useState(false)
     return (
         <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 dark:bg-accent bg-white relative transition-all">
 
-            <a href="#">
-                <img className="h-9" src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoColored.svg" alt="dummyLogoColored" />
-            </a>
+            <Link to="/">
+                <img className="h-13" src={logo} alt="dummyLogoColored" />
+            </Link>
 
             {/* Desktop Menu */}
             <div className="hidden sm:flex items-center gap-8">
-                <Link to={'/'}>All book</Link>
-                <a  href="#">Add book</a>
-                <a  href="#">Borrow summery</a>
+                <Link to={'/all_book'}>All book</Link>
+                <Link  to="/add_book">Add book</Link>
+                <Link to="/borrow_summery">Borrow summery</Link>
  
                 <div className="hidden lg:flex items-center text-sm gap-2">
                     <ModeToggle />

@@ -1,13 +1,14 @@
 import {  Edit } from 'lucide-react';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import ConfirmModal from './app_component/ConfirmModal';
 import { Badge } from '../ui/badge';
 import BorrowModal from './app_component/BorrowModal';
 import { useGetBookQuery } from '@/redux/rtkQuery/apiSlice';
 import { Skeleton } from '../ui/skeleton';
+import type { IBook } from '@/interface/IBook';
 
 const DataTable = () => {
-    const { data, isLoading, error } = useGetBookQuery({});
+    const { data, isLoading } = useGetBookQuery({});
 
     if(isLoading) {
         return(
@@ -44,7 +45,7 @@ const DataTable = () => {
             </TableHeader>
             <TableBody>
                 {
-                    data?.data.map((book, i) => (
+                    data?.data.map((book: IBook, i: number) => (
                             <TableRow key={i}>
                                 <TableCell className="font-medium">{i+1}</TableCell>
                                     <TableCell>{book?.title}</TableCell>

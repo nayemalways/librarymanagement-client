@@ -1,18 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import type { IBook } from "@/interface/IBook";
-import { usePostBookMutation } from "@/redux/rtkQuery/apiSlice";
-import { useForm } from "react-hook-form";
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import type { IBook } from '@/interface/IBook';
+import { usePostBookMutation } from '@/redux/rtkQuery/apiSlice';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 
- 
-const AddBook = () => {
-   const [postBook] = usePostBookMutation();
+const BookAdd = () => {
+    const [postBook] = usePostBookMutation();
    const form = useForm<IBook>({
     defaultValues: {
         title: "",
@@ -43,13 +43,12 @@ const AddBook = () => {
         }
         form.reset()
     };
-
-
     return (
-        <div className="max-w-130 m-auto">
-            <h1 className="text-4xl font-bold pt-5 max-sm:text-center">Add book </h1>
-            <div className="p-5 shadow-sm shadow-slate-800 sm:mt-10 sm:mb-20">
-                <Form {...form}>
+        <div>
+            <Popover>
+                <PopoverTrigger className='bg-teal-500 px-3 py-2 rounded'>+ Add Book</PopoverTrigger>
+                <PopoverContent>
+                    <Form {...form}>
                         <form onSubmit={form.handleSubmit(onsubmit)}>
                             <FormField
                                 control={form.control}
@@ -151,10 +150,10 @@ const AddBook = () => {
                             </Button>
                         </form>
                 </Form>
-            </div>
-             
+                </PopoverContent>
+            </Popover>
         </div>
     );
 };
 
-export default AddBook;
+export default BookAdd;

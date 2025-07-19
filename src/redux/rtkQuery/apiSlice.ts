@@ -13,6 +13,18 @@ export const baseApi = createApi({
             query: () => "book",
             providesTags: ["book"]
         }),
+
+        postBook: builder.mutation({
+            query: (payload) => ({
+                url: `book`,
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: payload
+            })
+        }),
+
         deleteBook: builder.mutation({
             query: (bookId) => ({
                 url: `book/${bookId}`,
@@ -20,6 +32,7 @@ export const baseApi = createApi({
             }),
            invalidatesTags: ['book']
         }),
+
         borrowBook: builder.mutation({
             query: (payload) => ({
                 url: `borrow`,
@@ -30,9 +43,20 @@ export const baseApi = createApi({
                 body: payload
             }),
            invalidatesTags: ['borrow']
+        }),
+
+        borrowSummery: builder.query({
+            query: () => "borrow",
+             providesTags: ["borrow"]
         })
         
     })
 })
 
-export const { useGetBookQuery, useDeleteBookMutation, useBorrowBookMutation } = baseApi;
+export const { 
+    useGetBookQuery, 
+    useDeleteBookMutation, 
+    useBorrowBookMutation, 
+    usePostBookMutation,
+    useBorrowSummeryQuery 
+} = baseApi;

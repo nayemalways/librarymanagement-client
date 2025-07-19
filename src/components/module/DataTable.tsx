@@ -1,14 +1,22 @@
-import {  Edit } from 'lucide-react';
+import { Edit, Trash } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import ConfirmModal from './app_component/ConfirmModal';
 import { Badge } from '../ui/badge';
 import BorrowModal from './app_component/BorrowModal';
-import { useGetBookQuery } from '@/redux/rtkQuery/apiSlice';
+import { useDeleteBookMutation, useGetBookQuery } from '@/redux/rtkQuery/apiSlice';
 import { Skeleton } from '../ui/skeleton';
 import type { IBook } from '@/interface/IBook';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
 
 const DataTable = () => {
     const { data, isLoading } = useGetBookQuery({});
+
+    // Delete a book
+    const [deleteBook] = useDeleteBookMutation();
+    const handleDelete = (bookId: string) => {
+         deleteBook(bookId);
+    }
+
+
 
     if(isLoading) {
         return(
@@ -29,7 +37,7 @@ const DataTable = () => {
     }
 
     return (
-        <Table  className='max-w-5xl h-auto m-auto rounded bg-slate-300 dark:bg-slate-800 md:mt-15'>
+        <Table  className='max-w-5xl h-auto m-auto rounded bg-slate-300 dark:bg-slate-800 md:mt-15 md:mb-10'>
             <TableHeader>
                 <TableRow>
                     <TableHead>Id</TableHead>
@@ -71,7 +79,20 @@ const DataTable = () => {
                                         <Edit/>
                                     </TableCell>
                                     <TableCell>
-                                        <ConfirmModal/>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger>
+                                                <Trash/>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Want to delete this item?</AlertDialogTitle>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(book?._id)} >Continue</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
                             </TableRow>
                     ))

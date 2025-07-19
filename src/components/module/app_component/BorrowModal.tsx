@@ -2,36 +2,68 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/ui/form';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { data } from '@/data/data';
-import { Select } from '@radix-ui/react-select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { IBook, IBorrow } from '@/interface/IBook';
+import { useBorrowBookMutation, useGetBookQuery } from '@/redux/rtkQuery/apiSlice';
 import { ChevronDownIcon, HandCoins } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm,  type SubmitHandler } from "react-hook-form"
+import toast from 'react-hot-toast';
+ 
 
 
 const BorrowModal = () => {
     const [open, setOpen] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     const [date, setDate] = useState<Date | undefined>(undefined);
-    const form = useForm();
-    return (
-        <>
-            <Dialog>
+    const form = useForm<IBorrow>();
+    const {data} = useGetBookQuery([]);
+    const [borowBook] = useBorrowBookMutation();
+
+    const onsubmit: SubmitHandler<IBorrow> = async (data) => {
+        try {
+            const res = await borowBook(data).unwrap();
+            if(res.success === true) {
+                toast.success(res.message);
+                form.reset();
+                setDate(undefined);
+            }
+            
+            setOpenDialog(false)
+            } catch (error: unknown) {
+                 if (typeof error === 'object' && error !== null) {
+                     const err = error as { data?: { error?: string }; message?: string };
+                     toast.error(err?.data?.error || err?.message || "An error occurred");
+                 } else {
+                     toast.error("An error occurred");
+                 }
+            }
+    }
+
+
+
+return (
+    <>
+            <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                 <DialogTrigger>
                     <HandCoins />
                 </DialogTrigger>
                 <DialogContent>
                      <Form {...form}>
-                        <FormField
+                        <form onSubmit={form.handleSubmit(onsubmit)}>
+                            <FormField
                             control={form.control}
-                            name="Title"
+                            name="book"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Title</FormLabel>
+                                    <FormLabel>book</FormLabel>
                                     <FormControl>
-                                        <Select {...field}>
+                                        <Select 
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select a book" />
                                             </SelectTrigger>
@@ -39,8 +71,8 @@ const BorrowModal = () => {
                                                 <SelectGroup>
                                                     <SelectLabel>Fruits</SelectLabel>
                                                     {
-                                                        data?.data.map((book) => (
-                                                            <SelectItem  key={book?._id} value={book?.title}>{book?.title}</SelectItem>
+                                                        data?.data.map((book: IBook) => (
+                                                            <SelectItem  key={book?._id} value={book?._id}>{book?.title}</SelectItem>
                                                         ))
                                                     } 
                                                 </SelectGroup>
@@ -52,36 +84,21 @@ const BorrowModal = () => {
                             />
                         <FormField
                             control={form.control}
-                            name="Genre"
+                            name="quantity"
                             render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Genre</FormLabel>
+                                <FormItem className="mt-2">
+                                    <FormLabel>Quantity</FormLabel>
                                     <FormControl>
-                                        <Select {...field}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select a book" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>Fruits</SelectLabel>
-                                                     <SelectItem value="Fiction">FICTION</SelectItem>
-                                                     <SelectItem value="Non_Fiction">NON_FICTION</SelectItem>
-                                                     <SelectItem value="History">HISTORY</SelectItem>
-                                                     <SelectItem value="Fantasy">FANTASY</SelectItem>
-                                                     <SelectItem value="Classic">CLASSIC</SelectItem>
-                                                     <SelectItem value="Dystopian">DYSTOPIAN</SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                            </Select>
+                                         <Input {...field} />
                                     </FormControl>
                                 </FormItem>
                             )}
                             />
                         <FormField
                             control={form.control}
-                            name="Genre"
+                            name="dueDate"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="mt-2">
                                     <FormLabel> Due Time</FormLabel>
                                     <FormControl>
                                         <div className="flex flex-col gap-3">
@@ -98,15 +115,16 @@ const BorrowModal = () => {
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto overflow-hidden p-0" align="start">
                                                 <Calendar
-
-                                                    {...field}
                                                     mode="single"
-                                                    selected={date}
+                                                    selected={field.value ? new Date(field.value) : undefined}
                                                     captionLayout="dropdown"
-                                                    onSelect={(date) => {
-                                                    setDate(date)
-                                                    setOpen(false)
+                                                    onSelect={(selectedDate) => {
+                                                        const isoString = selectedDate?.toISOString() || '';
+                                                        field.onChange(isoString); // now form value is a string
+                                                        setDate(selectedDate);     // for UI
                                                     }}
+
+
                                                 />
                                                 </PopoverContent>
                                             </Popover>
@@ -115,6 +133,11 @@ const BorrowModal = () => {
                                 </FormItem>
                             )}
                             />
+
+                            <Button className='mt-2 w-30' type='submit'>
+                                Submit
+                            </Button>
+                        </form>
                     </Form>
                 </DialogContent>
                 </Dialog>

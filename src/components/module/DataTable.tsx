@@ -6,14 +6,20 @@ import { useDeleteBookMutation, useGetBookQuery } from '@/redux/rtkQuery/apiSlic
 import { Skeleton } from '../ui/skeleton';
 import type { IBook } from '@/interface/IBook';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import toast from 'react-hot-toast';
 
 const DataTable = () => {
     const { data, isLoading } = useGetBookQuery({});
 
     // Delete a book
     const [deleteBook] = useDeleteBookMutation();
-    const handleDelete = (bookId: string) => {
-         deleteBook(bookId);
+    const handleDelete = async (bookId: string) => {
+        const res = await deleteBook(bookId);
+        if(res?.data?.success) {
+            toast.success(res?.data?.message)
+        }else {
+            toast.error("Can't delete book");
+        }
     }
 
 
